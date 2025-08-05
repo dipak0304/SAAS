@@ -1,5 +1,12 @@
+import { useAuth } from '@clerk/clerk-react';
+import axios from 'axios';
 import { Hash, Sparkles } from 'lucide-react'
 import React, { useState } from 'react'
+import toast from 'react-hot-toast'
+import Markdown from 'react-markdown';
+
+
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const BlogTitles = () => {
    const blogCategories  = ['General','Technology','Business','Health','Lifestyle','Education','Travel','Food']
@@ -7,9 +14,19 @@ const BlogTitles = () => {
   
    const [selectedCategory, setSelectedCategory] = useState('General')
    const [input, setInput] = useState('')
+    const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState('');
+
+  const { getToken } = useAuth();
   
    const onSubmitHandler = async (e)=>{
     e.preventDefault();
+    try {
+      setLoading(true)
+      
+    } catch (error) {
+      
+    }
    }
   return (
      <div className='h-full overflow-y-scroll p-6 flex items-start flex-wrap gap-4
