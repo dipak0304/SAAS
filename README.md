@@ -25,7 +25,8 @@ A full-stack SaaS (Software as a Service) platform that provides AI-powered tool
 git clone https://github.com/your-username/saas.git
 cd saas
 
-##  Install Dependencies:
+####  Install Dependencies:\
+
 # For frontend
 cd client
 npm install
