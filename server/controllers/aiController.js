@@ -194,12 +194,11 @@ export const generateImage = async (req, res) => {
 
 //background
 
-
 export const removeImageBackground = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { image} = req.file;
     const plan = req.plan;
+    const file = req.file;
 
     if (plan !== 'premium') {
       return res.status(403).json({
@@ -208,23 +207,20 @@ export const removeImageBackground = async (req, res) => {
       });
     }
 
-    if (!prompt || prompt.trim() === '') {
+    if (!file) {
       return res.status(400).json({
         success: false,
-        message: 'Prompt is required to remove background.',
+        message: 'Image file is required to remove background.',
       });
     }
 
-    
-
-
-   
-
-    const {secure_url} = await cloudinary.uploader.upload(image.path, {
-        transformation: [{
-            effect:'background_removal',
-            background_removal: 'remove_the_background'
-        }]
+    const { secure_url } = await cloudinary.uploader.upload(file.path, {
+      transformation: [
+        {
+          effect: 'background_removal',
+          background_removal: 'remove_the_background',
+        },
+      ],
     });
 
     await sql`
@@ -234,7 +230,7 @@ export const removeImageBackground = async (req, res) => {
 
     res.json({
       success: true,
-      content:secure_url,
+      content: secure_url,
     });
   } catch (error) {
     console.error('❌ Error background removal:', error);
@@ -250,12 +246,16 @@ export const removeImageBackground = async (req, res) => {
 };
 
 
+
+
+
+
 //remove image object
 export const removeImageObject = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { object } =req.body;
-    const { image} = req.file;
+    const { object } = req.body;
+    const file = req.file;
     const plan = req.plan;
 
     if (plan !== 'premium') {
@@ -265,26 +265,31 @@ export const removeImageObject = async (req, res) => {
       });
     }
 
-    if (!prompt || prompt.trim() === '') {
+    if (!object || object.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: 'Prompt is required to remove object.',
+        message: 'Object name is required to remove from the image.',
       });
     }
 
-    
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Image file is required.',
+      });
+    }
 
+    // Upload the image to Cloudinary first
+    const uploadResult = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'image',
+    });
 
-   
+    const imageURL = cloudinary.url(uploadResult.public_id, {
+      transformation: [{ effect: `gen_remove:${object}` }],
+      resource_type: 'image',
+    });
 
-    const {public_id} = await cloudinary.uploader.upload(image.path)
-
-    const imageURL=  cloudinary.url(public_id, {
-        transformation: [{effect:`gen_remove:${object}`}],
-        resource_type:'image'
-    })
-      
-
+    // Save to database
     await sql`
       INSERT INTO creations (user_id, prompt, content, type)
       VALUES (${userId}, ${`Removed ${object} from image`}, ${imageURL}, 'image')
@@ -292,10 +297,10 @@ export const removeImageObject = async (req, res) => {
 
     res.json({
       success: true,
-      content:imageURL,
+      content: imageURL,
     });
   } catch (error) {
-    console.error('❌ Error background removal:', error);
+    console.error('❌ Error removing object from image:', error);
 
     res.status(500).json({
       success: false,
@@ -308,14 +313,19 @@ export const removeImageObject = async (req, res) => {
 };
 
 
+
+
+
+
 //review resume
+
 export const resumeReview = async (req, res) => {
   try {
     const { userId } = req.auth();
-    
     const resume = req.file;
     const plan = req.plan;
 
+    // Check Subscription Plan
     if (plan !== 'premium') {
       return res.status(403).json({
         success: false,
@@ -323,54 +333,66 @@ export const resumeReview = async (req, res) => {
       });
     }
 
-    if (!prompt || prompt.trim() === '') {
+    // Check Resume File Exists
+    if (!resume) {
       return res.status(400).json({
         success: false,
-        message: 'resume pdf required',
+        message: 'Resume PDF file is required',
       });
     }
 
-    
-
-
-   
-
-    if(resume.size > 5 * 1024 * 1024){
-        return res.json({success:false, message:"Resume file size exceeds allowed size (5MB)."})
+    // Check Resume File Size (5MB Limit)
+    if (resume.size > 5 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: 'Resume file size exceeds allowed limit (5MB)',
+      });
     }
 
-    const dataBuffer = fs.readFileSync(resume.path)
-    const pdfData = await pdf(dataBuffer)
+    // Read and Parse PDF
+    let pdfData;
+    try {
+      const dataBuffer = fs.readFileSync(resume.path);
+      pdfData = await pdf(dataBuffer);
+    } catch (err) {
+      console.error('Error reading/parsing PDF:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to process the uploaded resume PDF.',
+      });
+    }
 
-    const prompt =`Review the following resume and provide constructive feedback on its strengths, weaknesses, and areas for improvement. Resume content:\n\n${pdfData.text}`
+    // Prepare Prompt for AI
+    const promptText = `Review the following resume and provide constructive feedback on its strengths, weaknesses, and areas for improvement.\n\nResume Content:\n${pdfData.text}`;
 
+    // AI API Call
     const response = await AI.chat.completions.create({
       model: 'gemini-2.0-flash',
       messages: [
         {
           role: 'user',
-          content: prompt,
+          content: promptText,
         },
       ],
       temperature: 0.7,
       max_tokens: 1000,
     });
 
-
     const content = response.choices[0].message.content;
-      
 
+    // Save Review to Database
     await sql`
       INSERT INTO creations (user_id, prompt, content, type)
       VALUES (${userId}, 'Review the uploaded resume', ${content}, 'resume-review')
     `;
 
+    // Success Response
     res.json({
       success: true,
-      content:content,
+      content,
     });
   } catch (error) {
-    console.error('❌ Error background removal:', error);
+    console.error('❌ Error in resume review:', error);
 
     res.status(500).json({
       success: false,
@@ -380,4 +402,5 @@ export const resumeReview = async (req, res) => {
         'An unexpected error occurred.',
     });
   }
-}
+};
+
