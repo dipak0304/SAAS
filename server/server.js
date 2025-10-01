@@ -1,4 +1,3 @@
-// server.js
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
@@ -9,9 +8,19 @@ import userRouter from './routes/userRoutes.js';
 
 const app = express();
 
-await connectCloudinary()
+await connectCloudinary();
 
-app.use(cors());
+// ✅ Allow only your Vercel frontend & local dev
+const allowedOrigins = [
+  "https://your-frontend.vercel.app",  // replace with your real Vercel frontend link
+  "http://localhost:5173"              // for local React dev
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(clerkMiddleware());
 
