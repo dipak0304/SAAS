@@ -12,7 +12,7 @@ await connectCloudinary();
 
 // ✅ Allow only your Vercel frontend & local dev
 const allowedOrigins = [
-  "https://your-frontend.vercel.app",  // replace with your real Vercel frontend link
+  "https://jholaai-client.vercel.app",  // replace with your real Vercel frontend link
   "http://localhost:5173"              // for local React dev
 ];
 
