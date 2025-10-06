@@ -27,7 +27,7 @@ A full-stack SaaS (Software as a Service) platform that provides AI-powered tool
 
 ### Clone the Repository:
 ```bash
-git clone https://github.com/your-username/saas.git
+git clone https://github.com/dipak0304your-username/saas.git
 cd saas
 
 ####  Install Dependencies:\
