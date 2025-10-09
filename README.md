@@ -1,6 +1,6 @@
 # SaaS Platform 🚀
 
-A full-stack SaaS (Software as a Service) platform that provides AI-powered tools for content creation and image editing. Users can generate images, write articles & blogs, and perform advanced image editing like background and object removal.
+A full-stack SaaS (Software as a Service) platform that provides AI-powered tools for content creation and image editing. Users can generate images, write articles & blogs, and perform advanced image editing like background and object removal also community.
 
 ## 🌟 Features
 - ✨ **AI Image Generation** — Generate high-quality images from text prompts.
