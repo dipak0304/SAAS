@@ -18,7 +18,7 @@ const Footer = () => {
                     <li><a href="#">Home</a></li>
                     <li><a href="#">About us</a></li>
                     <li><a href="https://jhola-media.vercel.app/">Contact us</a></li>
-                    <li><a href="#">Privacy policy</a></li>
+                    <li><a href="https://fullstack-music-1.onrender.com/">Music</a></li>
                 </ul>
             </div>
             <div>
