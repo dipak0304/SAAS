@@ -16,7 +16,7 @@ A full-stack SaaS (Software as a Service) platform that provides AI-powered tool
 - Database: PostgreSQL (Neon Database)
 - Authentication: Clerk.dev
 - Hosting: Vercel (Frontend), Railway/Render (Backend)
-- AI Integration: ClipDrop API, OpenAI API
+- AI Integration: ClipDrop API, GROK API(free best)top 
 
 [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/dipak.bohara03/)
 [![Facebook](https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/dipakbohara006)
