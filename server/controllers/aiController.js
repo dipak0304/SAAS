@@ -86,7 +86,7 @@ export const generateBlogTitle = async (req, res) => {
     }
 
     const response = await AI.chat.completions.create({
-      model: 'gemini-2.0-flash',
+      model: 'llama-3.1-8b-instant',
       messages: [
         {
           role: 'user',
@@ -367,7 +367,7 @@ export const resumeReview = async (req, res) => {
 
     // AI API Call
     const response = await AI.chat.completions.create({
-      model: 'gemini-2.0-flash',
+      model: 'llama-3.1-8b-instant',
       messages: [
         {
           role: 'user',
