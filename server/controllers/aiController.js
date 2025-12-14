@@ -12,7 +12,7 @@ import pdf from 'pdf-parse/lib/pdf-parse.js'
 
 const AI = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY,
-  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+  baseURL: 'https://api.groq.com/openai/v1',
 });
 
 export const generateArticle = async (req, res) => {
@@ -30,7 +30,7 @@ export const generateArticle = async (req, res) => {
     }
 
     const response = await AI.chat.completions.create({
-      model: 'gemini-1.5-flash',
+      model: 'llama-3.1-8b-instant',
       messages: [
         {
           role: 'user',
